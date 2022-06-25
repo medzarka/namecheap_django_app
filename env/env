@@ -1,0 +1,8 @@
+DEBUG=True
+SECRET_KEY=0abOUV5sS6nPoNdvEwuSDKIXWhaWIFYKZ5xuFbATXGkOxovyrCE
+SITE_URL=test.bluewaves.online
+SITE_DATA_PATH=subdomains/data/test.bluewaves.online/
+SITE_MEDIA_PATH=subdomains/sites/test.bluewaves.online/
+SITE_URL=test.bluewaves.online
+
+DATABASE_URL=mysql://mzarka_test:mzarka_test@127.0.0.1:3306/mzarka_test

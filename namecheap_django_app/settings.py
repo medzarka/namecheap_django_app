@@ -12,36 +12,65 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 #####
 import os.path
-
-_base_media_dir = '/Users/mzarka/.media/namecheap_django_app'
-_base_data_dir = '/Users/mzarka/.data/namecheap_django_app'
-_secret = ')sk)#f&8op^k11%jc+e3=%=5se^$4q9_y3+ligklee=*m1035a'
-_debug = True
-_hosts= ['127.0.0.1', ]
-
-
-_static_dir=os.path.join(_base_media_dir, 'static')
-os.makedirs(_static_dir, exist_ok=True)
-_media_dir=os.path.join(_base_media_dir, 'media')
-os.makedirs(_base_media_dir, exist_ok=True)
-_logs_dir = os.path.join(_base_data_dir, 'logs')
-os.makedirs(_logs_dir, exist_ok=True)
-
+import sys
 from pathlib import Path
+import environ
+
+from tools import createDir
+from tools import FileLogger
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+if 'env_file' in os.environ.keys():
+    env_file = os.path.join(BASE_DIR, 'env', os.getenv('env_file'))
+    print(f'Configuration Site in file {env_file}.')
+else:
+    env_file = 'env'
+    env_file = os.path.join(BASE_DIR, 'env', 'env')
+    print(f'Configuration Site in file {env_file}.')
+
+if env_file is None:
+    print(f'The env filename "env_file" is not set !')
+    sys.exit(-1)
+
+if not os.path.exists(os.path.join(BASE_DIR, env_file)):
+    print(f'The env filename {env_file} does not exist!')
+    sys.exit(-1)
+
+env = environ.Env()
+env.read_env(os.path.join(BASE_DIR, env_file))
+
+SITE_DATA_DIR = os.path.join(os.environ['HOME'], env('SITE_DATA_PATH'))
+SITE_MEDIA_DIR = os.path.join(os.environ['HOME'], env('SITE_DATA_PATH'))
+SITE_MEDIA_STATIC_DIR = os.path.join(SITE_MEDIA_DIR, 'static')
+SITE_MEDIA_MEDIA_DIR = os.path.join(SITE_MEDIA_DIR, 'media')
+SITE_LOG_DIR = os.path.join(SITE_DATA_DIR, 'logs')
+SITE_DB_DIR = os.path.join(SITE_DATA_DIR, 'database')
+createDir(SITE_DATA_DIR)
+createDir(SITE_MEDIA_DIR)
+createDir(SITE_MEDIA_STATIC_DIR)
+createDir(SITE_MEDIA_MEDIA_DIR)
+createDir(SITE_LOG_DIR)
+createDir(SITE_DB_DIR)
+
+_fileLogger = FileLogger(os.path.join(SITE_LOG_DIR, 'trace.txt'))
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
+_fileLogger.debug(f'#######  The django app started.')
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = _secret
+SECRET_KEY = env.str('SECRET_KEY')
+_fileLogger.debug(f'The secret is {SECRET_KEY}')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = _debug
+DEBUG = env.bool('DEBUG')
+_fileLogger.debug(f'The debug mode is set to {DEBUG}')
 
-ALLOWED_HOSTS = _hosts
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', env.str('SITE_URL')]
+_fileLogger.debug(f'The site url is set to {env.str("SITE_URL")}')
 
 # Application definition
 
@@ -89,12 +118,17 @@ WSGI_APPLICATION = 'namecheap_django_app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if env.str('DATABASE_URL', default=''):
+    DATABASES = {
+        'default': env.db(),
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': SITE_DB_DIR.path('db')('django.sqlite3'),
+        },
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -129,19 +163,21 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 
-
-
-
 STATIC_URL = '/static/'
-STATIC_ROOT = _static_dir
+STATIC_ROOT = SITE_MEDIA_STATIC_DIR
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
+_fileLogger.debug(f'The static files are served from {SITE_MEDIA_STATIC_DIR}')
+MEDIA_ROOT = SITE_MEDIA_MEDIA_DIR
+MEDIA_URL = '/media/'
+_fileLogger.debug(f'The media files are served from {SITE_MEDIA_MEDIA_DIR}')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOG_FILE = os.path.join(_logs_dir, 'trace.log')
+LOG_FILE = os.path.join(SITE_LOG_DIR, 'trace.log')
+_fileLogger.debug(f'The log file is stored in {LOG_FILE}')
 
 LOGGING = {
     "version": 1,
