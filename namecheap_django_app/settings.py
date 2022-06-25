@@ -10,23 +10,38 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
+#####
+import os.path
+
+_base_media_dir = '/Users/mzarka/.media/namecheap_django_app'
+_base_data_dir = '/Users/mzarka/.data/namecheap_django_app'
+_secret = ')sk)#f&8op^k11%jc+e3=%=5se^$4q9_y3+ligklee=*m1035a'
+_debug = True
+_hosts= ['127.0.0.1', ]
+
+
+_static_dir=os.path.join(_base_media_dir, 'static')
+os.makedirs(_static_dir, exist_ok=True)
+_media_dir=os.path.join(_base_media_dir, 'media')
+os.makedirs(_base_media_dir, exist_ok=True)
+_logs_dir = os.path.join(_base_data_dir, 'logs')
+os.makedirs(_logs_dir, exist_ok=True)
+
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ')sk)#f&8op^k11%jc+e3=%=5se^$4q9_y3+ligklee=*m1035a'
+SECRET_KEY = _secret
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = _debug
 
-ALLOWED_HOSTS = ['*']
-
+ALLOWED_HOSTS = _hosts
 
 # Application definition
 
@@ -37,6 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'web',
 ]
 
 MIDDLEWARE = [
@@ -70,7 +86,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'namecheap_django_app.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
@@ -80,7 +95,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -100,7 +114,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
@@ -112,20 +125,23 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = 'static/'
-STATIC_ROOT = '/home/mzarka/subdomains/sites/test.bluewaves.online/static'
+
+
+
+
+STATIC_URL = '/static/'
+STATIC_ROOT = _static_dir
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-LOG_FILE = "/home/mzarka/logs/web.log"
+LOG_FILE = os.path.join(_logs_dir, 'trace.log')
 
 LOGGING = {
     "version": 1,
