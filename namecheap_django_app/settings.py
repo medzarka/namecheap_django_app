@@ -42,7 +42,7 @@ env = environ.Env()
 env.read_env(os.path.join(BASE_DIR, env_file))
 
 SITE_DATA_DIR = os.path.join(os.environ['HOME'], env('SITE_DATA_PATH'))
-SITE_MEDIA_DIR = os.path.join(os.environ['HOME'], env('SITE_DATA_PATH'))
+SITE_MEDIA_DIR = os.path.join(os.environ['HOME'], env('SITE_MEDIA_PATH'))
 SITE_MEDIA_STATIC_DIR = os.path.join(SITE_MEDIA_DIR, 'static')
 SITE_MEDIA_MEDIA_DIR = os.path.join(SITE_MEDIA_DIR, 'media')
 SITE_LOG_DIR = os.path.join(SITE_DATA_DIR, 'logs')
