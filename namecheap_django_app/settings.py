@@ -58,7 +58,7 @@ _fileLogger = FileLogger(os.path.join(SITE_LOG_DIR, 'trace.txt'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
-
+_fileLogger.debug(f'#########################################.')
 _fileLogger.debug(f'#######  The django app started.')
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -70,7 +70,7 @@ DEBUG = env.bool('DEBUG')
 _fileLogger.debug(f'The debug mode is set to {DEBUG}')
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', env.str('SITE_URL')]
-_fileLogger.debug(f'The site url is set to {env.str("SITE_URL")}')
+_fileLogger.debug(f'The site url is set to {ALLOWED_HOSTS}')
 
 # Application definition
 
@@ -116,19 +116,24 @@ TEMPLATES = [
 WSGI_APPLICATION = 'namecheap_django_app.wsgi.application'
 
 # Database
-# https://docs.djangoproject.com/en/4.0/ref/settings/#databases
+# https://docs.djangoproject.com/en/3.1/ref/settings/#databases
+DEVELOPMENT_MODE = env.bool('DEVELOPMENT_MODE', default=False)
 
-if env.str('DATABASE_URL', default=''):
-    DATABASES = {
-        'default': env.db(),
-    }
-else:
+if DEVELOPMENT_MODE is True:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': SITE_DB_DIR.path('db')('django.sqlite3'),
+            'NAME': os.path.join(SITE_DB_DIR, 'db.sqlite3'),
         },
     }
+elif len(sys.argv) > 0 and sys.argv[1] != 'collectstatic':
+    if os.getenv("DATABASE_URL", None) is None:
+        raise Exception("DATABASE_URL environment variable not defined")
+    DATABASES = {
+        'default': env.db(),
+    }
+
+_fileLogger.debug(f'The database url is set to {DATABASES}')
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -152,11 +157,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
+TIME_ZONE = env.str('TIME_ZONE', default='Asia/Riyadh')
+_fileLogger.debug(f'The timezone is set to {TIME_ZONE}')
 USE_I18N = True
-
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)

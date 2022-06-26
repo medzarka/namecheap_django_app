@@ -1,4 +1,6 @@
 DEBUG=True
+DEVELOPMENT_MODE=False
+TIME_ZONE=Asia/Riyadh
 SECRET_KEY=0abOUV5sS6nPoNdvEwuSDKIXWhaWIFYKZ5xuFbATXGkOxovyrCE
 SITE_URL=test.bluewaves.online
 SITE_DATA_PATH=subdomains/data/test.bluewaves.online/

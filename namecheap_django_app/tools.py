@@ -18,7 +18,7 @@ class FileLogger:
     def _write_msg(self, level, msg):
         _now = datetime.datetime.now()
         f = open(self.filename, mode='a', encoding='UTF-8')
-        f.write(f'[{level}]  -- {_now.strftime("%A %d %B %Y")}] {msg} \n')
+        f.write(f'[{level}]  -- {_now.strftime("%A %d %B %Y   HH:MM:SS")}] {msg} \n')
         f.close()
 
 
